@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信红包</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        .red-envelope {
+            background: linear-gradient(to bottom, #e64340, #d81e06);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+            padding: 30px 20px;
+            text-align: center;
+            color: #fff;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .red-envelope:hover {
+            transform: translateY(-5px);
+        }
+        
+        .gold-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(to right, #d4af37, #f9e076, #d4af37);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .title {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .amount {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 25px 0;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.3);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .amount::before {
+            content: "¥";
+            font-size: 1.8rem;
+            position: absolute;
+            left: -25px;
+            top: 10px;
+        }
+        
+        .sender {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 10px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3498db, #1abc9c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .sender-info {
+            text-align: left;
+        }
+        
+        .sender-name {
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .sender-text {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .open-btn {
+            background: linear-gradient(to bottom, #f5d328, #d4af37);
+            border: none;
+            border-radius: 50px;
+            padding: 16px 0;
+            width: 180px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #d81e06;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .open-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.4);
+        }
+        
+        .open-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .open-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+        
+        .open-btn:hover::before {
+            left: 100%;
+        }
+        
+        .result {
+            display: none;
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-title {
+            font-size: 2rem;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        
+        .result-content {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #555;
+        }
+        
+        .emoji {
+            font-size: 4rem;
+            margin: 20px 0;
+            animation: bounce 1s infinite alternate;
+        }
+        
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
+        
+        .shake-phone {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 2px dashed #3498db;
+        }
+        
+        .shake-title {
+            font-size: 1.4rem;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .phone-icon {
+            font-size: 3rem;
+            color: #3498db;
+            animation: shake 0.8s infinite;
+        }
+        
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-10deg); }
+            100% { transform: rotate(0deg); }
+        }
+        
+        .progress {
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 50px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            border-radius: 50px;
+            width: 0%;
+            transition: width 1.5s ease;
+        }
+        
+        .footer {
+            color: white;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .hint {
+            margin-top: 20px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 480px) {
+            .amount {
+                font-size: 2.8rem;
+            }
+            
+            .title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>微信整蛊红包</h1>
+            <p>点击领取你的专属红包</p>
+        </div>
+        
+        <div class="red-envelope">
+            <div class="gold-border"></div>
+            <div class="logo">
+                <i class="fas fa-gift"></i>
+            </div>
+            <h2 class="title">恭喜发财，大吉大利</h2>
+            <p class="subtitle">微信红包，一点就开</p>
+            
+            <div class="amount">200.00</div>
+            
+            <div class="sender">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="sender-info">
+                    <div class="sender-name">神秘好友</div>
+                    <div class="sender-text">给你发了一个红包</div>
+                </div>
+            </div>
+            
+            <button class="open-btn" id="openBtn">開</button>
+            
+            <p class="hint">提示：红包金额随机，最高可达200元</p>
+        </div>
+        
+        <div class="result" id="result">
+            <h2 class="result-title">哈哈，你被骗了！</h2>
+            <div class="emoji">😂</div>
+            <p class="result-content">
+                恭喜你发现了这个整蛊红包！<br>
+                其实并没有真正的红包，但希望这个玩笑能给你带来一点欢乐！<br>
+                分享给朋友，一起开心一下吧！
+            </p>
+            
+            <div class="shake-phone">
+                <h3 class="shake-title">摇动手机有惊喜</h3>
+                <div class="phone-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <p>摇动你的手机，看看会发生什么！</p>
+                
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <p id="progressText">正在等待摇动...</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>本页面仅供娱乐，不会收集任何用户信息</p>
+            <p>© 2023 微信整蛊小游戏</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('openBtn').addEventListener('click', function() {
+            // 隐藏红包，显示结果
+            document.querySelector('.red-envelope').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            
+            // 初始化摇手机进度
+            let progress = 0;
+            let progressBar = document.getElementById('progressBar');
+            let progressText = document.getElementById('progressText');
+            let shakeCount = 0;
+            
+            // 摇手机事件监听
+            function handleShake() {
+                shakeCount++;
+                progress = Math.min(100, shakeCount * 10);
+                progressBar.style.width = progress + '%';
+                
+                if (progress < 50) {
+                    progressText.textContent = `摇动中... ${progress}%`;
+                } else if (progress < 100) {
+                    progressText.textContent = `继续摇动... ${progress}%`;
+                } else {
+                    progressText.textContent = "恭喜！获得虚拟红包一个！";
+                    progressText.style.color = "#27ae60";
+                    progressText.style.fontWeight = "bold";
+                    window.removeEventListener('devicemotion', handleMotion);
+                }
+            }
+            
+            // 检测设备摇动
+            function handleMotion(event) {
+                let acceleration = event.accelerationIncludingGravity;
+                let x = acceleration.x;
+                let y = acceleration.y;
+                let z = acceleration.z;
+                
+                // 计算加速度变化
+                let accelerationChange = Math.abs(x) + Math.abs(y) + Math.abs(z);
+                
+                if (accelerationChange > 25) {
+                    handleShake();
+                }
+            }
+            
+            // 请求设备方向权限
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener('devicemotion', handleMotion);
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                window.addEventListener('devicemotion', handleMotion);
+            }
+        });
+    </script>
+</body>
+</html>
